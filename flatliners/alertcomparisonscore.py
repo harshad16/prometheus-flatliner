@@ -5,6 +5,7 @@ from numpy import array
 from dataclasses import dataclass
 import flatliners
 
+
 class AlertComparisonScore(BaseFlatliner):
     def __init__(self):
         super().__init__()
@@ -73,8 +74,7 @@ class AlertComparisonScore(BaseFlatliner):
         self.alert_deltas = self.create_cache_dict(maxsize=1000)
 
     def on_next(self, x):
-        """ update l2 distance between cluster vector and baseline vector
-        """
+        """Update l2 distance between cluster vector and baseline vector."""
         # determine entry type
         if isinstance(x, flatliners.alertfrequencyversion.AlertFrequencyVersion.State):
             # if we have version data, we want to populate/ update a version record
@@ -93,18 +93,17 @@ class AlertComparisonScore(BaseFlatliner):
             if self.ready_to_publish(x):
                 self.publish(self.score[x.cluster])
 
-
-    def update_version_alerts(self,x):
+    def update_version_alerts(self, x):
         if x.version not in self.versions:
-            self.versions[x.version]= dict()
+            self.versions[x.version] = dict()
         self.versions[x.version][x.alert] = x.avg_frequency
 
-    def update_cluster_alerts(self,x):
+    def update_cluster_alerts(self, x):
         if x.cluster not in self.clusters:
             self.clusters[x.cluster] = dict()
         self.clusters[x.cluster][x.alert] = x.frequency
 
-    def initialize_metric_state(self,x):
+    def initialize_metric_state(self, x):
         state = self.State()
         state.cluster = x.cluster
         state.version = x.version
@@ -113,7 +112,7 @@ class AlertComparisonScore(BaseFlatliner):
         state.timestamp = x.timestamp
         self.score[x.cluster] = state
 
-    def compute_norm(self,x):
+    def compute_norm(self, x):
         # Build the subtracted value array by matching values by alert names as no guarantee dictionaries are in order
         subtracted_metrics = []
         # Loop on cluster keys to avoid matching alerts found in version but not in cluster
@@ -123,16 +122,19 @@ class AlertComparisonScore(BaseFlatliner):
             if alert not in self.versions[x.version]:
                 pass
             else:
-                subtracted_metrics.append(self.versions[x.version][alert]
-                                          - self.clusters[x.cluster][alert])
+                subtracted_metrics.append(
+                    self.versions[x.version][alert] - self.clusters[x.cluster][alert]
+                )
         subtracted_metrics = array(subtracted_metrics)
         return norm(subtracted_metrics)
 
-    def compute_alert_delta(self,x):
-        delta = abs(self.versions[x.version][x.alert] - self.clusters[x.cluster][x.alert])
+    def compute_alert_delta(self, x):
+        delta = abs(
+            self.versions[x.version][x.alert] - self.clusters[x.cluster][x.alert]
+        )
         if x.cluster not in self.alert_deltas:
             self.alert_deltas[x.cluster] = dict()
-        self.alert_deltas[x.cluster][x.alert]  = delta
+        self.alert_deltas[x.cluster][x.alert] = delta
         self.score[x.cluster].alert_deltas = self.alert_deltas[x.cluster]
 
     def ready_to_publish(self, x):
@@ -144,12 +146,11 @@ class AlertComparisonScore(BaseFlatliner):
         else:
             return False
 
-
     @dataclass
     class State:
         cluster: str = ""
-        version:str = ""
-        alert:str = ""
+        version: str = ""
+        alert: str = ""
         comparison_score: float = 0.0
         timestamp: float = 0.0
-        alert_deltas:str =  ""
+        alert_deltas: str = ""

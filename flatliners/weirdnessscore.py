@@ -3,6 +3,7 @@ import flatliners
 
 from dataclasses import dataclass
 
+
 class WeirdnessScore(BaseFlatliner):
     def __init__(self):
         super().__init__()
@@ -37,7 +38,9 @@ class WeirdnessScore(BaseFlatliner):
         cluster_name = x.cluster
         version = x.version
 
-        if isinstance(x, flatliners.resourcecomparisonscore.ResourceComparisonScore.State):
+        if isinstance(
+            x, flatliners.resourcecomparisonscore.ResourceComparisonScore.State
+        ):
 
             if cluster_name not in self.resource_score:
                 self.resource_score[cluster_name] = self.Resource_State()
@@ -51,7 +54,9 @@ class WeirdnessScore(BaseFlatliner):
             self.resource_score[cluster_name].resource_deltas = x.resource_deltas
 
             if self.resource_score[cluster_name].std_dev_buffer:
-                self.resource_score[cluster_name].weirdness_score = self.resource_score[cluster_name].std_dev
+                self.resource_score[cluster_name].weirdness_score = self.resource_score[
+                    cluster_name
+                ].std_dev
                 self.publish(self.resource_score[cluster_name])
 
         if isinstance(x, flatliners.alertcomparisonscore.AlertComparisonScore.State):
@@ -67,8 +72,6 @@ class WeirdnessScore(BaseFlatliner):
 
             self.publish(self.alert_score[cluster_name])
 
-
-
     @dataclass
     class Resource_State:
 
@@ -77,7 +80,7 @@ class WeirdnessScore(BaseFlatliner):
         resource: str = ""
         std_dev: float = 0.0
         timestamp: float = 0.0
-        weirdness_score:float = 0.0
+        weirdness_score: float = 0.0
         std_dev_buffer: bool = False
         resource_deltas: str = ""
 

@@ -1,5 +1,6 @@
 from .baseflatliner import BaseFlatliner
 
+
 class VersionedMetrics(BaseFlatliner):
     def __init__(self):
         super().__init__()
@@ -14,7 +15,7 @@ class VersionedMetrics(BaseFlatliner):
         self.buffer = dict()
 
     def on_next(self, x):
-        if self.metric_name(x) == 'cluster_version':
+        if self.metric_name(x) == "cluster_version":
             self.update_cluster_versions(x)
             return
 
@@ -49,5 +50,5 @@ class VersionedMetrics(BaseFlatliner):
             del self.buffer[cluster_id]
 
     def add_version_and_publish(self, metric, version):
-        metric['metric']['version'] = version
+        metric["metric"]["version"] = version
         self.publish(metric)

@@ -2,6 +2,7 @@ from influxdb import InfluxDBClient
 import os
 import logging
 
+
 def main():
 
     # Set up logging
@@ -12,10 +13,14 @@ def main():
     else:
         logging_level = logging.INFO
     # Log record format
-    logging.basicConfig(format='%(asctime)s:%(levelname)s: %(message)s', level=logging_level)
+    logging.basicConfig(
+        format="%(asctime)s:%(levelname)s: %(message)s", level=logging_level
+    )
 
     # clean influxdb
-    flt_influx__db_dsn = os.getenv("FLT_INFLUX_DB_DSN", "influxdb://username:password@localhost:8086")
+    flt_influx__db_dsn = os.getenv(
+        "FLT_INFLUX_DB_DSN", "influxdb://username:password@localhost:8086"
+    )
     flt_influx_db_name = os.getenv("FLT_INFLUX_DB_NAME", "flatliners")
 
     client = InfluxDBClient.from_dsn(flt_influx__db_dsn)
@@ -25,5 +30,5 @@ def main():
     client.create_database(flt_influx_db_name)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

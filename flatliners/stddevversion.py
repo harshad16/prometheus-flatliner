@@ -1,6 +1,7 @@
 from .baseflatliner import BaseFlatliner
 from dataclasses import dataclass
 
+
 class StdDevVersion(BaseFlatliner):
     def __init__(self):
         super().__init__()
@@ -22,9 +23,7 @@ class StdDevVersion(BaseFlatliner):
         self.versions = self.create_cache_dict(maxsize=200)
 
     def on_next(self, x):
-        """ update std dev for version
-        """
-
+        """Update std dev for version."""
         # grab the resource name and the version id
         resource = x.resource
         version_id = x.version
@@ -36,25 +35,26 @@ class StdDevVersion(BaseFlatliner):
 
         # if the resource hasen't been seen before, do std_dev initilization
         if resource not in self.versions[version_id]:
-            self.versions[version_id][resource] = self.calculate_version_std(value, resource, version_id)
+            self.versions[version_id][resource] = self.calculate_version_std(
+                value, resource, version_id
+            )
 
         # if the resource exists, grab the last entry for that cluster, resource pair.
         # set the new value to the updated values.
         else:
             previous = self.versions[version_id][resource]
-            self.versions[version_id][resource] = self.calculate_version_std(value, resource,
-                                                                       version_id, previous)
+            self.versions[version_id][resource] = self.calculate_version_std(
+                value, resource, version_id, previous
+            )
 
         self.publish(self.versions[version_id][resource])
 
-
-
-    def calculate_version_std(self, value, resource, version, previous = None):
+    def calculate_version_std(self, value, resource, version, previous=None):
         # TODO: chnage from avg std to actual std for all availble resources in clusters with shared versions.
         if previous:
             count = previous.count + 1
             total = previous.total + value
-            version_std_dev = total/count
+            version_std_dev = total / count
 
         else:
             # initilize version std_dev with output of first cluster
@@ -71,12 +71,11 @@ class StdDevVersion(BaseFlatliner):
 
         return state
 
-
     @dataclass
     class State:
 
         resource: str = ""
         avg_std_dev: float = 0.0
-        total:float = 0.0
-        count:float = 0.0
-        version:str = ""
+        total: float = 0.0
+        count: float = 0.0
+        version: str = ""

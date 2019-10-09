@@ -4,86 +4,86 @@ metadata:
   name: prometheus-flatliner-historic-job-template
 
 objects:
-- apiVersion: batch/v1
-  kind: Job
-  metadata:
-    namespace: ${NAMESPACE}
-    name: ${APPLICATION_NAME}
-    labels:
-      app: prometheus-flatliner-app
-      job_batch: ${APPLICATION_NAME}
-  spec:
-    parallelism: 1
-    completions: 1
-    template:
-      metadata:
-        name: ${APPLICATION_NAME}
-      spec:
-        containers:
-        - name: ${APPLICATION_NAME}
-          image: prometheus-flatliner:latest
-          imagePullPolicy: Always
-          resources:
-            requests:
-              cpu: 1
-              memory: 500Mi
-            limits:
-              cpu: 1
-              memory: 2Gi
-          env:
-          - name: FLT_PROM_URL
-            value: "${FLT_PROM_URL}"
-          - name: FLT_PROM_ACCESS_TOKEN
-            value: "${FLT_PROM_ACCESS_TOKEN}"
-          - name: FLT_METRICS_LIST
-            value: "${FLT_METRICS_LIST}"
-          - name: FLT_METRIC_START_DATETIME
-            value: "${FLT_METRIC_START_DATETIME}"
-          - name: FLT_METRIC_END_DATETIME
-            value: "${FLT_METRIC_END_DATETIME}"
-          - name: FLT_METRIC_CHUNK_SIZE
-            value: "${FLT_METRIC_CHUNK_SIZE}"
-          - name: FLT_VERSION_FILTER_REGEX
-            value: "${FLT_VERSION_FILTER_REGEX}"
-          - name: FLT_INFLUX_DB_DSN
-            value: "${FLT_INFLUX_DB_DSN}"
-          - name: FLT_DEBUG_MODE
-            value: "${FLT_DEBUG_MODE}"
-        restartPolicy: Never
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      namespace: ${NAMESPACE}
+      name: ${APPLICATION_NAME}
+      labels:
+        app: prometheus-flatliner-app
+        job_batch: ${APPLICATION_NAME}
+    spec:
+      parallelism: 1
+      completions: 1
+      template:
+        metadata:
+          name: ${APPLICATION_NAME}
+        spec:
+          containers:
+            - name: ${APPLICATION_NAME}
+              image: prometheus-flatliner:latest
+              imagePullPolicy: Always
+              resources:
+                requests:
+                  cpu: 1
+                  memory: 500Mi
+                limits:
+                  cpu: 1
+                  memory: 2Gi
+              env:
+                - name: FLT_PROM_URL
+                  value: "${FLT_PROM_URL}"
+                - name: FLT_PROM_ACCESS_TOKEN
+                  value: "${FLT_PROM_ACCESS_TOKEN}"
+                - name: FLT_METRICS_LIST
+                  value: "${FLT_METRICS_LIST}"
+                - name: FLT_METRIC_START_DATETIME
+                  value: "${FLT_METRIC_START_DATETIME}"
+                - name: FLT_METRIC_END_DATETIME
+                  value: "${FLT_METRIC_END_DATETIME}"
+                - name: FLT_METRIC_CHUNK_SIZE
+                  value: "${FLT_METRIC_CHUNK_SIZE}"
+                - name: FLT_VERSION_FILTER_REGEX
+                  value: "${FLT_VERSION_FILTER_REGEX}"
+                - name: FLT_INFLUX_DB_DSN
+                  value: "${FLT_INFLUX_DB_DSN}"
+                - name: FLT_DEBUG_MODE
+                  value: "${FLT_DEBUG_MODE}"
+          restartPolicy: Never
 
 parameters:
-- name: NAMESPACE
-  required: true
-- description: The name for job
-  from: 'prometheus-flatliner-historic-[a-z0-9]{4}'
-  generate: expression
-  name: APPLICATION_NAME
-  required: true
-- name: FLT_PROM_URL
-  description: URL of prometheus server
-  required: true
-- name: FLT_PROM_ACCESS_TOKEN
-  description: Bearer Token for accessing prometheus
-  required: true
-- name: FLT_METRICS_LIST
-  description: List of metrics to be collected from Prometheus
-  required: true
-- name: FLT_METRIC_START_DATETIME
-  description: Metric data timeframe - Start Time
-  required: true
-- name: FLT_METRIC_END_DATETIME
-  description: Metric data timeframe - End Time
-  required: true
-- name: FLT_METRIC_CHUNK_SIZE
-  description: Size of chunks of metrics collected from prometheus at an instance
-  required: true
-- name: FLT_INFLUX_DB_DSN
-  description: The URL to connect to an influx database
-  required: true
-- name: FLT_DEBUG_MODE
-  description: Enable verbose log for debugging
-  value: 'False'
-  required: false
-- name: FLT_VERSION_FILTER_REGEX
-  description: Regex expression to filter for metrics based on version info, eg. '^4\.0'
-  required: false
+  - name: NAMESPACE
+    required: true
+  - description: The name for job
+    from: 'prometheus-flatliner-historic-[a-z0-9]{4}'
+    generate: expression
+    name: APPLICATION_NAME
+    required: true
+  - name: FLT_PROM_URL
+    description: URL of prometheus server
+    required: true
+  - name: FLT_PROM_ACCESS_TOKEN
+    description: Bearer Token for accessing prometheus
+    required: true
+  - name: FLT_METRICS_LIST
+    description: List of metrics to be collected from Prometheus
+    required: true
+  - name: FLT_METRIC_START_DATETIME
+    description: Metric data timeframe - Start Time
+    required: true
+  - name: FLT_METRIC_END_DATETIME
+    description: Metric data timeframe - End Time
+    required: true
+  - name: FLT_METRIC_CHUNK_SIZE
+    description: Size of chunks of metrics collected from prometheus at an instance
+    required: true
+  - name: FLT_INFLUX_DB_DSN
+    description: The URL to connect to an influx database
+    required: true
+  - name: FLT_DEBUG_MODE
+    description: Enable verbose log for debugging
+    value: 'False'
+    required: false
+  - name: FLT_VERSION_FILTER_REGEX
+    description: Regex expression to filter for metrics based on version info, eg. '^4\.0'
+    required: false

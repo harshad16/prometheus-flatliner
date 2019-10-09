@@ -1,12 +1,9 @@
 from .baseflatliner import BaseFlatliner
 from dataclasses import dataclass
 
-class AlertFrequencyVersion(BaseFlatliner):
 
-    """
-    This class contains the functionalities to calculate
-    alert correlation shift over multiple gitversion
-    """
+class AlertFrequencyVersion(BaseFlatliner):
+    """This class contains the functionalities to calculate alert correlation shift over multiple gitversion."""
 
     def __init__(self):
         super().__init__()
@@ -17,9 +14,7 @@ class AlertFrequencyVersion(BaseFlatliner):
         self.version_frequencies = self.create_cache_dict(maxsize=200)
 
     def on_next(self, x):
-        """ On each data loading it will calculate the average alert frequency for an alert
-        """
-
+        """On each data loading it will calculate the average alert frequency for an alert."""
         alert = x.alert
         version = x.version
 
@@ -28,7 +23,7 @@ class AlertFrequencyVersion(BaseFlatliner):
             # promql: count(count(alerts) by (alertname))
             self.version_frequencies[version] = self.create_cache_dict(maxsize=100)
 
-        if alert not in  self.version_frequencies[version]:
+        if alert not in self.version_frequencies[version]:
             self.initilize_version_alert(x)
 
         else:
@@ -36,8 +31,6 @@ class AlertFrequencyVersion(BaseFlatliner):
             self.update_version_alert(x, previous)
 
         self.publish(self.version_frequencies[version][alert])
-
-
 
     def initilize_version_alert(self, x):
 
@@ -53,7 +46,6 @@ class AlertFrequencyVersion(BaseFlatliner):
         state.timestamp = x.timestamp
         self.version_frequencies[x.version][x.alert] = state
 
-
     def update_version_alert(self, x, previous):
 
         # update cluster frequency
@@ -64,15 +56,13 @@ class AlertFrequencyVersion(BaseFlatliner):
         # update time_stamp
         previous.timestamp = x.timestamp
         # reset entry
-        self.version_frequencies[x.version][x.alert] =  previous
-
-
+        self.version_frequencies[x.version][x.alert] = previous
 
     @dataclass
     class State:
 
         alert: str = ""
         version: str = ""
-        cluster_frequencies: str = "" # becomes dictionary
+        cluster_frequencies: str = ""  # becomes dictionary
         avg_frequency: float = 0.0
         timestamp: float = 0.0

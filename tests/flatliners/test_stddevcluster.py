@@ -2,13 +2,12 @@ from flatliners import StdDevCluster
 import numpy as np
 from statistics import stdev
 
-class TestStdDevCluster():
 
-
+class TestStdDevCluster:
     def test_single_entry_initilize_calculation(self):
 
         sdc = StdDevCluster()
-        x = [[0,'5']]
+        x = [[0, "5"]]
 
         count, mean, total, std_dev, m2 = sdc.initilize_calculation(x)
 
@@ -21,7 +20,7 @@ class TestStdDevCluster():
     def test_multiple_entry_initilize_calculation(self):
 
         sdc = StdDevCluster()
-        x = [[0, '5'], [0, '10'], [0, '25']]
+        x = [[0, "5"], [0, "10"], [0, "25"]]
 
         count, mean, total, std_dev, m2 = sdc.initilize_calculation(x)
 
@@ -29,8 +28,7 @@ class TestStdDevCluster():
         assert mean == np.mean([5, 10, 25])
         assert total == sum([5, 10, 25])
         assert std_dev == stdev([5, 10, 25])
-        assert m2 == sum((np.array([5, 10, 25]) - mean)**2)
-
+        assert m2 == sum((np.array([5, 10, 25]) - mean) ** 2)
 
     def test_continue_calculation(self):
 
@@ -42,7 +40,7 @@ class TestStdDevCluster():
         previous.m2 = 0
         previous.std_dev = 0
 
-        x = [[0, '0']]
+        x = [[0, "0"]]
 
         count, mean, total, std_dev, m2 = sdc.continue_calculation(x, previous)
 
@@ -50,11 +48,4 @@ class TestStdDevCluster():
         assert mean == np.mean([5, 5, 0])
         assert total == 10
         assert std_dev == stdev([0, 5, 5])
-        assert m2 == sum((np.array([0,5, 5]) - mean)**2)
-
-
-
-
-
-
-
+        assert m2 == sum((np.array([0, 5, 5]) - mean) ** 2)

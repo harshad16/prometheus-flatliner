@@ -3,6 +3,7 @@ from rx.subjects import Subject
 
 from cachetools import LRUCache
 
+
 class BaseFlatliner(Observer):
     subject = None
 
@@ -27,20 +28,20 @@ class BaseFlatliner(Observer):
 
     @staticmethod
     def metric_label(metric, name):
-        return metric['metric'].get(name, None)
+        return metric["metric"].get(name, None)
 
     @staticmethod
     def metric_values(x):
-        return x['values']
+        return x["values"]
 
     def metric_name(self, x):
-        return self.metric_label(x, '__name__')
+        return self.metric_label(x, "__name__")
 
     def cluster_id(self, x):
-        return self.metric_label(x, '_id')
+        return self.metric_label(x, "_id")
 
     def cluster_version(self, x):
-        return self.metric_label(x, 'version')
+        return self.metric_label(x, "version")
 
     @staticmethod
     def create_cache_dict(maxsize=2000):

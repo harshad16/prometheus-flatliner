@@ -2,6 +2,7 @@ from .baseflatliner import BaseFlatliner
 from statistics import stdev
 from dataclasses import dataclass
 
+
 class StdDevCluster(BaseFlatliner):
     def __init__(self):
         super().__init__()
@@ -22,14 +23,13 @@ class StdDevCluster(BaseFlatliner):
         self.clusters = self.create_cache_dict(maxsize=1000)
 
     def on_next(self, x):
-        """ update calculate std dev for cluster
-        """
+        """Update calculate std dev for cluster."""
         # stop if the metric name is not etcd_object_count
-        if not self.metric_name(x) == 'etcd_object_counts':
+        if not self.metric_name(x) == "etcd_object_counts":
             return
 
         # grab the resource name and the cluster id
-        resource = self.metric_label(x, 'resource')
+        resource = self.metric_label(x, "resource")
         cluster_id = self.cluster_id(x)
         version_id = self.cluster_version(x)
 
@@ -39,20 +39,21 @@ class StdDevCluster(BaseFlatliner):
 
         # if the resource hasen't been seen before, do std_dev initilization
         if resource not in self.clusters[cluster_id]:
-            self.clusters[cluster_id][resource] = self.calculate_stdv(self.metric_values(x), resource,
-                                                                      cluster_id, version_id)
+            self.clusters[cluster_id][resource] = self.calculate_stdv(
+                self.metric_values(x), resource, cluster_id, version_id
+            )
 
         # if the resource exists, grab the last entry for that cluster.
         # set the new value to the updated values.
         else:
             previous = self.clusters[cluster_id][resource]
-            self.clusters[cluster_id][resource] = self.calculate_stdv(self.metric_values(x), resource,
-                                                                      cluster_id, version_id, previous)
+            self.clusters[cluster_id][resource] = self.calculate_stdv(
+                self.metric_values(x), resource, cluster_id, version_id, previous
+            )
 
         self.normalize_cluster(cluster_id, resource)
         self.clusters[cluster_id][resource].timestamp = x["values"][0][0]
         self.publish(self.clusters[cluster_id][resource])
-
 
     @staticmethod
     def continue_calculation(values, previous):
@@ -62,7 +63,9 @@ class StdDevCluster(BaseFlatliner):
             current_total = previous.total + current_value
             current_mean = current_total / current_count
 
-            m2 = previous.m2 + abs((current_value - previous.mean) * (current_value - current_mean))
+            m2 = previous.m2 + abs(
+                (current_value - previous.mean) * (current_value - current_mean)
+            )
             # added absolute value function to prevent std from being expressed as an imaginary number.
             std_dev = (m2 / (current_count - 1)) ** 0.5
 
@@ -77,8 +80,6 @@ class StdDevCluster(BaseFlatliner):
         total = current_total
 
         return count, mean, total, std_dev, m2
-
-
 
     @staticmethod
     def initilize_calculation(values):
@@ -98,12 +99,13 @@ class StdDevCluster(BaseFlatliner):
             mean = int(values[0][1])
             m2 = 0
 
-        return count, mean,total, std_dev, m2
+        return count, mean, total, std_dev, m2
 
-
-    def calculate_stdv(self, values, name, cluster, version, previous = None):
+    def calculate_stdv(self, values, name, cluster, version, previous=None):
         if previous:
-            count, mean, total, std_dev, m2 = self.continue_calculation(values, previous)
+            count, mean, total, std_dev, m2 = self.continue_calculation(
+                values, previous
+            )
         else:
             count, mean, total, std_dev, m2 = self.initilize_calculation(values)
 
@@ -117,7 +119,6 @@ class StdDevCluster(BaseFlatliner):
         state.version = version
 
         return state
-
 
     def normalize_cluster(self, cluster_id, resource):
         # get the values:
@@ -136,11 +137,11 @@ class StdDevCluster(BaseFlatliner):
 
         for value, name in zip(resource_list, resource_names):
             if max_value != min_value:
-                self.clusters[cluster_id][name].std_dev = ((value - min_value)/(max_value - min_value))\
-                                                          / (resource_vector_length)**(0.5)
+                self.clusters[cluster_id][name].std_dev = (
+                    (value - min_value) / (max_value - min_value)
+                ) / (resource_vector_length) ** (0.5)
             else:
                 self.clusters[cluster_id][name].std_dev = 0.0
-
 
     @dataclass
     class State:
@@ -154,6 +155,3 @@ class StdDevCluster(BaseFlatliner):
         count: float = 0.0
         version: str = ""
         timestamp: float = 0.0
-
-
-
